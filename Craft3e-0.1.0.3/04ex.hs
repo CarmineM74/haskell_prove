@@ -1,0 +1,95 @@
+module Ex04 where
+import PicturesSVG
+
+blackSquares :: Int -> Picture
+blackSquares n
+  | n<=1 = black
+  | otherwise = beside black $ blackSquares (n-1)
+
+whiteSquares :: Int -> Picture
+whiteSquares n = invertColour $ blackSquares n
+
+blackWhite :: Int -> Picture
+blackWhite n 
+  | n<=1 = black
+  | otherwise = beside black $ whiteBlack (n-1)
+
+whiteBlack :: Int -> Picture
+whiteBlack n
+  | n<=1 = white
+  | otherwise = beside white $ blackWhite (n-1) 
+
+blackChess :: Int -> Int -> Picture
+blackChess n m
+  | n <= 1 = blackWhite m
+  | otherwise = above (blackWhite m) (whiteChess (n-1) m)
+
+whiteChess :: Int -> Int -> Picture
+whiteChess n m
+  | n <= 1 = whiteBlack m
+  | otherwise = above (whiteBlack m) (blackChess (n-1) m) 
+
+column :: Picture -> Int -> Picture
+column pic n
+  | n <= 1 = pic
+  | otherwise = above pic $ column pic (n-1) 
+
+blackInARow :: Int -> Int -> Picture
+blackInARow l 1 = beside black $ whiteSquares (l-2)
+blackInARow l p = beside (whiteSquares (p-1)) (beside black $ whiteSquares (l-p-1))
+
+rotateRight :: Int -> Int -> Picture
+rotateRight l p
+  | p<=1 = blackInARow l 1
+  | otherwise = above (rotateRight l (p-1)) (blackInARow l p)
+
+diagLR :: Int -> Picture
+diagLR n = rotateRight n n
+
+rotateLeft :: Int -> Int -> Picture
+rotateLeft l p
+  | p>=l = blackInARow l l
+  | otherwise = above (rotateLeft l (p+1)) (blackInARow l p)
+
+diagRL :: Int -> Picture
+diagRL n = rotateLeft n 1
+
+alternatingColumn :: Picture -> Int -> Picture
+alternatingColumn pic n
+  | n <= 1 = pic
+  | otherwise = above pic $ alternatingColumn (negative pic) (n-1) 
+
+chessBoard :: Int -> Picture
+chessBoard n 
+  | n<=1 = black
+  | otherwise = above (blackWhite n) (beside (alternatingColumn white (n-1)) (chessBoard (n-1)))
+
+-- Ex. 4.31
+
+hcf :: Int -> Int -> Int -> Int 
+hcf n m p 
+  | p<= 1 = 1
+  | (isFactor n p) && (isFactor m p) = p
+  | otherwise = hcf n m (p-1)
+  where 
+	isFactor x y = rem x y == 0 
+
+highestCommonFactor :: Int -> Int -> Int
+highestCommonFactor n m
+  | n < m = hcf n m n
+  | otherwise = hcf n m m
+
+-- Ex. 4.32
+-- if n is even
+-- 2^n = 2^(2*m) = (2^m)^2
+-- otherwise
+-- 2^n = 2^(2*m+1) = ((2^m)^2)*2
+--
+powOf2 :: Int -> Int
+powOf2 n
+  | n == 0 = 1
+  | n == 1 = 2
+  | even n = (powOf2 m)^2
+  | otherwise = (powOf2 (n-1))*2
+  where
+	m = div n 2

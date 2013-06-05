@@ -1,0 +1,4 @@
+mymult :: Int -> Int -> Int
+mymult n m
+  | m == 1 = n
+  | otherwise = n + mymult n (m-1)

@@ -1,0 +1,15 @@
+module Ex05 where
+
+-- Ex 5.1
+maxOccurs :: Int -> Int -> (Int, Int)
+maxOccurs m n 
+  | m > n = (m,1)
+  | n > m = (n,1)
+  | otherwise = (n,2)
+
+maxThreeOccurs :: Int -> Int -> Int -> (Int, Int)
+maxThreeOccurs m n p = (r,cnt3)
+	where
+		(q,cnt1) = maxOccurs m n
+		(r,cnt2) = maxOccurs q p
+		cnt3 = if q == p then cnt1+1 else cnt2 
